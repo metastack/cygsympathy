@@ -34,11 +34,14 @@ for /f "delims=" %%f in ('dir /s/b/al "%1" 2^>nul') do (
 
 :: Magic files will be checked and may be converted to native symlinks
 for /f "delims=" %%f in ('dir /s/b/as-d "%1" 2^>nul') do (
-  %SYSTEMROOT%\system32\find /v /c "" "%%f" | findstr /r " 1$" > nul
-  if not errorlevel 1 (
-    findstr /r "^!<symlink>" "%%f" > nul
-    if not errorlevel 1 echo cookie:%%f
-  )
+  rem This isn't working when run during setup, for unknown reasons
+  rem %SYSTEMROOT%\system32\find /v /c "" "%%f" | findstr /r " 1$" > nul
+  rem if not errorlevel 1 (
+  rem  findstr /r "^!<symlink>" "%%f" > nul
+  rem  if not errorlevel 1 echo cookie:%%f
+  rem )
+  findstr /r "^!<symlink>" "%%f" > nul
+  if not errorlevel 1 echo cookie:%%f
 )
 
 goto :EOF
