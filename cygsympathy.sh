@@ -6,6 +6,8 @@
 
 # CygSymPathy main script created 14-Oct-2020
 
+cd $(dirname "$0")
+
 symlink ()
 {
   if [ "${1#/}" != "$1" -o "${1#~}" != "$1" ] ; then
@@ -26,7 +28,7 @@ symlink ()
   fi
 }
 
-cmd /c scan.cmd $(cygpath -w /) | tr -d '\r' | while IFS= read -r entry ; do
+cmd /c cygsympathy.cmd $(cygpath -w /) | tr -d '\r' | while IFS= read -r entry ; do
   type=${entry%%:*}
   entry="${entry#*:}"
   cygwin_entry="$(cygpath "$entry")"
@@ -38,7 +40,7 @@ cmd /c scan.cmd $(cygpath -w /) | tr -d '\r' | while IFS= read -r entry ; do
 #  esac
 
   target=$(readlink "$cygwin_entry")
-  if [ -x "$target" -a "$target" != 'exe' -a "${target##*.}" != 'exe' ] && cmd /c scan.cmd :lnk $(cygpath -wa $target) ; then
+  if [ -x "$target" -a "$target" != 'exe' -a "${target##*.}" != 'exe' ] && cmd /c cygsympathy.cmd :lnk $(cygpath -wa $target) ; then
     actual_target="$target.exe"
   else
     actual_target="$target"
@@ -62,7 +64,7 @@ cmd /c scan.cmd $(cygpath -w /) | tr -d '\r' | while IFS= read -r entry ; do
     fi
   fi
 
-  if [ "$type" = "lnk" ] && ! cmd /c scan.cmd :lnk "$raw_entry" ; then
+  if [ "$type" = "lnk" ] && ! cmd /c cygsympathy.cmd :lnk "$raw_entry" ; then
     echo "Cannot process $entry since $raw_entry also exists"
   else
     # /proc/cygdrive can't be represented as a native symbolic link, but if we're using native
