@@ -6,7 +6,7 @@
 
 # CygSymPathy main script created 14-Oct-2020
 
-cd $(dirname "$0")
+cd $(dirname $(realpath "$0"))
 
 symlink ()
 {
