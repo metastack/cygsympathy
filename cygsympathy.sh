@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -e
 ####################################################################################################
 # Copyright (c) 2020 David Allsopp Ltd.                                                            #
 # Distributed under clauses 1 and 3 of BSD-3-Clause, see terms at the end of this file.            #
@@ -6,16 +6,16 @@
 
 # CygSymPathy main script created 14-Oct-2020
 
-cd $(dirname $(realpath "$0"))
+cd "$(dirname "$(realpath "$0")")"
 
 symlink ()
 {
-  if [ "${1#/}" != "$1" -o "${1#~}" != "$1" ] ; then
+  if [ "${1#/}" != "$1" ] || [ "${1#~}" != "$1" ] ; then
     # Absolute path - ln should be fine
     CYGWIN='winsymlinks:native' ln -sfT "$1" "$2"
   else
     # Relative target - assume Cygwin will mangle the link
-    target_dir=$(dirname $2)
+    target_dir=$(dirname "$2")
     if [ -d "$target_dir/$1" ] ; then
       flag='/D'
     else
@@ -23,12 +23,12 @@ symlink ()
     fi
     pwd=$(pwd)
     cd "$target_dir"
-    cmd /c mklink $flag "$(basename $2)" "$(echo "$1" | sed -e 's|/|\\|g')" > /dev/null
+    cmd /c mklink "$flag" "$(basename "$2")" "$(echo "$1" | sed -e 's|/|\\|g')" > /dev/null
     cd "$pwd"
   fi
 }
 
-cmd /c cygsympathy.cmd $(cygpath -w /) | tr -d '\r' | while IFS= read -r entry ; do
+cmd /c cygsympathy.cmd "$(cygpath -w /)" | tr -d '\r' | while IFS= read -r entry ; do
   type=${entry%%:*}
   entry="${entry#*:}"
   cygwin_entry="$(cygpath "$entry")"
@@ -40,7 +40,7 @@ cmd /c cygsympathy.cmd $(cygpath -w /) | tr -d '\r' | while IFS= read -r entry ;
 #  esac
 
   target=$(readlink "$cygwin_entry")
-  if [ -x "$target" -a "$target" != 'exe' -a "${target##*.}" != 'exe' ] && cmd /c cygsympathy.cmd :lnk $(cygpath -wa $target) ; then
+  if [ -x "$target" ] && [ "$target" != 'exe' ] && [ "${target##*.}" != 'exe' ] && cmd /c cygsympathy.cmd :lnk "$(cygpath -wa "$target")" ; then
     actual_target="$target.exe"
   else
     actual_target="$target"
@@ -51,14 +51,14 @@ cmd /c cygsympathy.cmd $(cygpath -w /) | tr -d '\r' | while IFS= read -r entry ;
   if [ "$type" = 'lnk' ] ; then
     final_entry="${final_entry%.lnk}"
   fi
-  if [ "$target" != 'exe' -a "${target##*.}" = 'exe' ] ; then
+  if [ "$target" != 'exe' ] && [ "${target##*.}" = 'exe' ] ; then
     # Target is an executable
     if [ "$type" = 'lnk' ] ; then
       raw_entry="${entry%.lnk}"
     else
       raw_entry="${entry}"
     fi
-    if [ "$raw_entry" = 'exe' -o "${raw_entry##*.}" != 'exe' ] ; then
+    if [ "$raw_entry" = 'exe' ] || [ "${raw_entry##*.}" != 'exe' ] ; then
       # This isn't actually done until later because this might still be a system file
       final_entry="$final_entry.exe"
     fi
