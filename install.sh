@@ -8,7 +8,7 @@ dest=/usr/lib/cygsympathy
 
 install -d "$dest"
 install -T -m 755 cygsympathy.sh "$dest/cygsympathy"
-install -t cygsympathy.cmd "$dest"
+install -t "$dest" cygsympathy.cmd
 ln -sfT "$dest/cygsympathy" /etc/postinstall/zp_cygsympathy.sh
 
 ####################################################################################################
