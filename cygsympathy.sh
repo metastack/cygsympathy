@@ -23,7 +23,7 @@ symlink ()
     fi
     pwd=$(pwd)
     cd "$target_dir"
-    cmd /c mklink "$flag" "$(basename "$2")" "$(echo "$1" | sed -e 's|/|\\|g')" > /dev/null
+    cmd /c mklink $flag "$(basename "$2")" "$(echo "$1" | sed -e 's|/|\\|g')" > /dev/null
     cd "$pwd"
   fi
 }
