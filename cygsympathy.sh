@@ -1,6 +1,6 @@
 #!/bin/sh -e
 ####################################################################################################
-# Copyright (c) 2020 David Allsopp Ltd.                                                            #
+# Copyright (c) 2020, 2021 David Allsopp Ltd.                                                      #
 # Distributed under clauses 1 and 3 of BSD-3-Clause, see terms at the end of this file.            #
 ####################################################################################################
 
@@ -88,6 +88,8 @@ cmd /c cygsympathy.cmd "$(cygpath -w /)" | tr -d '\r' | while IFS= read -r entry
     case "$actual_target" in
       /proc/*)
         if [ "$type" != 'cookie' ] ; then
+          # No value in adding .exe for a cookie based entry
+          actual_target="$target"
           rm -f "$cygwin_entry"
           printf "!<symlink>%s" "$actual_target" > "$final_entry"
           chattr -f +s "$final_entry"
@@ -126,7 +128,7 @@ cmd /c cygsympathy.cmd "$(cygpath -w /)" | tr -d '\r' | while IFS= read -r entry
 done
 
 ####################################################################################################
-# Copyright (c) 2020 David Allsopp Ltd.                                                            #
+# Copyright (c) 2020, 2021 David Allsopp Ltd.                                                      #
 #                                                                                                  #
 # Redistribution and use in source and binary forms, with or without modification, are permitted   #
 # provided that the following two conditions are met:                                              #
