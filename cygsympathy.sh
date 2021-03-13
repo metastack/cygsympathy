@@ -45,12 +45,6 @@ cmd /c cygsympathy.cmd "$(cygpath -w /)" | tr -d '\r' | while IFS= read -r entry
   entry="${entry#*:}"
   cygwin_entry="$(cygpath "$entry")"
 
-  # XXX Is the a way of detecting these being remounted?!
-#  case "$cygwin_entry" in
-#    /usr/bin/*|/usr/lib/*)
-#      cygwin_entry=${cygwin_entry#/usr};;
-#  esac
-
   target=$(readlink "$cygwin_entry")
   if [ -x "$target" ] && [ "$target" != 'exe' ] && [ "${target##*.}" != 'exe' ] && cmd /c cygsympathy.cmd :lnk "$(cygpath -wa "$target")" ; then
     actual_target="$target.exe"
@@ -84,7 +78,6 @@ cmd /c cygsympathy.cmd "$(cygpath -w /)" | tr -d '\r' | while IFS= read -r entry
     # to be mounted somewhere, we use cygpath to find it.
     case "$target" in
       /proc/cygdrive/*)
-        # COMBAK Perhaps a configuration option for these always to be magic files?
         path="${target#/proc/cygdrive/}"
         letter="${path%%/*}"
         path="${path#*/}"
@@ -93,7 +86,6 @@ cmd /c cygsympathy.cmd "$(cygpath -w /)" | tr -d '\r' | while IFS= read -r entry
         fi
         actual_target="$(cygpath "$letter:")"
         actual_target="${actual_target%%/}/$path"
-        #echo "For $entry, rewriting $target to $actual_target path"
     esac
 
     test_link=false
@@ -105,7 +97,6 @@ cmd /c cygsympathy.cmd "$(cygpath -w /)" | tr -d '\r' | while IFS= read -r entry
           rm -f "$cygwin_entry"
           printf "!<symlink>%s" "$actual_target" > "$final_entry"
           chattr -f +s "$final_entry"
-          # XXX Want a proper debugging function for this - only dipslya target if different from actual_target, etc.
           test_link=true
           report "$cygwin_entry" "$target" "$final_entry" "$actual_target" ' via cookie'
         fi;;
