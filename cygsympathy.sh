@@ -28,6 +28,16 @@ symlink ()
   fi
 }
 
+report ()
+{
+  if [ "$1" != "$3" ] || [ "$2" != "$4" ] ; then
+    with_note=" with $3 -> $4"
+  else
+    with_note=''
+  fi
+  echo "Re-created $1 -> $2$with_note$5"
+}
+
 cmd /c cygsympathy.cmd "$(cygpath -w /)" | tr -d '\r' | while IFS= read -r entry ; do
   type=${entry%%:*}
   entry="${entry#*:}"
@@ -95,7 +105,7 @@ cmd /c cygsympathy.cmd "$(cygpath -w /)" | tr -d '\r' | while IFS= read -r entry
           chattr -f +s "$final_entry"
           # XXX Want a proper debugging function for this - only dipslya target if different from actual_target, etc.
           test_link=true
-          echo "Re-created $cygwin_entry -> $target with $final_entry -> $actual_target via cookie"
+          report "$cygwin_entry" "$target" "$final_entry" "$actual_target" ' via cookie'
         fi;;
       *)
         if [ "$type" = 'symlink' ] ; then
@@ -105,7 +115,7 @@ cmd /c cygsympathy.cmd "$(cygpath -w /)" | tr -d '\r' | while IFS= read -r entry
             fi
             symlink "$actual_target" "$final_entry"
             test_link=true
-            echo "Re-created $cygwin_entry -> $target with $final_entry -> $actual_target"
+            report "$cygwin_entry" "$target" "$final_entry" "$actual_target"
           elif [ "$final_entry" != "$cygwin_entry" ] ; then
             mv "$cygwin_entry" "$final_entry"
             echo "Renamed $cygwin_entry to $final_entry"
@@ -114,7 +124,7 @@ cmd /c cygsympathy.cmd "$(cygpath -w /)" | tr -d '\r' | while IFS= read -r entry
           rm -f "$cygwin_entry"
           symlink "$actual_target" "$final_entry"
           test_link=true
-          echo "Re-created $cygwin_entry -> $target with $final_entry -> $actual_target"
+          report "$cygwin_entry" "$target" "$final_entry" "$actual_target"
         fi;;
     esac
 
