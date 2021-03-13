@@ -38,6 +38,8 @@ report ()
   echo "Re-created $1 -> $2$with_note$5"
 }
 
+error_cookie='/tmp/cygsympathy-errors'
+rm -f "$error_cookie"
 cmd /c cygsympathy.cmd "$(cygpath -w /)" | tr -d '\r' | while IFS= read -r entry ; do
   type=${entry%%:*}
   entry="${entry#*:}"
@@ -132,10 +134,19 @@ cmd /c cygsympathy.cmd "$(cygpath -w /)" | tr -d '\r' | while IFS= read -r entry
       content="$(readlink "$final_entry")"
       if [ "$content" != "$actual_target" ] ; then
         echo "ERROR: $final_entry is expected to point to $actual_target but the link returns $content"
+        touch "$error_cookie"
       fi
     fi
   fi
 done
+
+if [ -e "$error_cookie" ] ; then
+  rm -f "$error_cookie"
+  status=1
+else
+  status=0
+fi
+exit $status
 
 ####################################################################################################
 # Copyright (c) 2020, 2021 David Allsopp Ltd.                                                      #
