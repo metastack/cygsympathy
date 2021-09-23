@@ -29,3 +29,5 @@ magic files and shortcuts and performs the following conversions:
   `.exe` is added to the target if the target requires it. For example, `ln -sf xz /bin/xzcat` will
   be changed so that `/bin/xzcat.exe` is a symlink to `xz.exe`. This ensures `xzcat` can be executed
   from CMD in the same way as `xz`.
+
+**Note that the Cygwin installation must include libicu-devel for the uconv command**

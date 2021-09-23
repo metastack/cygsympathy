@@ -95,7 +95,8 @@ cmd /c cygsympathy.cmd "$(cygpath -w /)" | tr -d '\r' | while IFS= read -r entry
           # No value in adding .exe for a cookie based entry
           actual_target="$target"
           rm -f "$cygwin_entry"
-          printf "!<symlink>%s" "$actual_target" > "$final_entry"
+          echo -n '!<symlink>' > "$final_entry"
+          echo -ne "$actual_target\\000" | uconv -t UTF16LE --add-signature >> "$final_entry"
           chattr -f +s "$final_entry"
           test_link=true
           report "$cygwin_entry" "$target" "$final_entry" "$actual_target" ' via cookie'
